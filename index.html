@@ -1,0 +1,172 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>sndio</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="language" content="en">
+<link rel="stylesheet" type="text/css" href="sndio.css">
+</head>
+<body>
+
+<h1>sndio home</h1>
+
+<h2>About - what is sndio?</h2>
+
+<p>
+Sndio is a small audio and MIDI framework part of the OpenBSD project
+and ported to FreeBSD, Linux and NetBSD.
+
+It provides a lightweight audio & MIDI server and a fully
+documented user-space API to access either the server or directly the
+hardware in a uniform way.
+
+Sndio is designed to work for desktop applications, but pays special
+attention to synchronization mechanisms and reliability required by
+music applications.
+
+Reliability through simplicity are part of the
+project goals.
+
+<h2>Operating systems supporting sndio</h2>
+
+<p>
+This source code builds on any OpenBSD, Linux, or FreeBSD
+system with no modifications.
+
+Patches to make sndio build on NetBSD are available in the ports tree.
+
+<p>
+Binaries are available for the following operating systems:
+
+<ul>
+
+<li>
+FreeBSD, in the ports tree,
+see <a href="https://www.freshports.org/audio/sndio/">port details</a>
+
+<li>
+Linux (including ArchLinux, Gentoo, Debian, Ubuntu)
+
+<li>
+NetBSD, in the ports tree
+
+</ul>
+
+<p>
+Porting sndio, consists of writing a module for the sndio library;
+it is around a thousand lines of C.
+
+The sndio daemon itself uses this library for audio I/O so it requires
+virtually no porting efforts.
+
+<h2>Programs supporting sndio</h2>
+
+<p>
+Many open-source programs including major media-players, web-browsers,
+audio libraries and utilities have native sndio support.
+
+Other programs have patches in the OpenBSD ports tree waiting for
+upstream integration.
+
+<h2>Downloads &amp; installation</h2>
+
+<p>
+Refer to <a href="install.html">installation instructions</a>
+for more details.
+
+<p>
+Source tar-balls:
+
+<ul>
+
+<li><tt><a href="sndio-1.7.0.tar.gz">sndio-1.7.0.tar.gz</a></tt>
+	[<tt><a href="sndio-1.7.0.tar.gz.asc">PGP</a>
+	 <a href="sndio-1.7.0.tar.gz.sha256">SHA256</a></tt>]
+	- stable release from jul 11, 2020
+
+<li><tt><a href="sndio.tar.gz">sndio.tar.gz</a></tt>
+	[<tt><a href="sndio.tar.gz.asc">PGP</a>
+	<a href="sndio.tar.gz.sha256">SHA256</a></tt>]
+	- development snapshot from jul 11, 2020 <b>(recommended)</b>
+
+</ul>
+
+<p>Using git:
+<pre>git clone https://caoua.org/git/sndio</pre>
+
+<h2>Documentation</h2>
+
+<p>
+The complete documentation is part of the OpenBSD project:
+
+<ul>
+
+<li>
+<a href="https://man.openbsd.org/sndio">sndio(7)</a>
+- overview, device names
+
+<li>
+<a href="https://man.openbsd.org/sndiod">sndiod(8)</a>
+- audio & MIDI server manual
+
+<li>
+<a href="https://man.openbsd.org/sio_open">sio_open(3)</a>
+- audio programming interface
+
+<li>
+<a href="https://man.openbsd.org/mio_open">mio_open(3)</a>
+- MIDI programming interface
+
+</ul>
+
+<p>
+A <a href="mail.html">mailing-list</a> dedicated
+to non-OpenBSD-related discussions is available (archives
+are <a href="arch/">here</a>).
+
+<h2>Links</h2>
+
+<ul>
+
+<li>
+AsiaBSDCon 2010 presentation:
+<a href="https://www.openbsd.org/papers/asiabsdcon2010_sndio_slides.pdf">slides</a>,
+<a href="https://www.openbsd.org/papers/asiabsdcon2010_sndio.pdf">paper</a>.
+
+The document is somewhat outdated, but discussions about the design
+are still true.
+
+<li>
+Recipes for developers and porters -
+<a href="tips.html">hints on writing &amp; porting audio code</a>
+
+</ul>
+
+<h2>Related projects</h2>
+
+<p>
+
+<ul>
+
+<li>
+<a href="https://www.alsa-project.org/">ALSA</a>
+
+<li>
+<a href="https://jackaudio.org/">JACK</a>
+
+<li>
+<a href="http://www.opensound.com/">OSS</a>
+
+<li>
+<a href="https://www.freedesktop.org/wiki/Software/PulseAudio/">PulseAudio</a>
+
+</ul>
+
+<p>
+<small><i>
+Copyright (c) 2013 Alexandre Ratchov<br>
+Last updated sep 28, 2020
+</i></small>
+
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>sndio on Linux</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="language" content="en">
+<link rel="stylesheet" type="text/css" href="sndio.css">
+</head>
+<body>
+
+<h1>Installation</h1>
+
+<h2>Requirements</h2>
+
+<p>
+On Linux only ALSA headers and libraries are necessary:
+
+<ul>
+
+<li>libasound2-dev package (debian, ubuntu and alike).
+
+<li>alsa-lib-devel package (redhat, fedora and alike).
+
+</ul>
+
+<h2>Download sources</h2>
+
+<p>
+Sources of the latest stable release (jul 11, 2020):
+
+<a href="sndio-1.7.0.tar.gz">sndio-1.7.0.tar.gz</a>
+
+<p>
+From the git repository:
+
+<pre>
+git clone https://caoua.org/git/sndio
+</pre>
+
+<h2>Compilation</h2>
+
+<p>
+For instance, run:
+
+<pre>
+./configure
+make
+</pre>
+
+<p>
+Run "./configure --help" to see all available options.
+
+<h2>Installation</h2>
+
+<p>
+This step requires root privileges:
+
+<pre>
+mkdir /var/run/sndiod
+useradd -r -g audio -s /sbin/nologin -d /var/run/sndiod sndiod
+make install
+ldconfig
+</pre>
+
+<p>
+If sndio is installed in a non-standard location, don't forget
+to update /etc/ld.so.conf accordingly before running ldconfig.
+
+<h2>Testing</h2>
+
+<p>
+First, ensure the audio device is not used by other programs.  Then,
+in one window start the sndio server as root (-dd options are to force
+the server to stay in foreground):
+
+<pre>
+sndiod -dd
+</pre>
+
+In another window try to play a .wav file:
+
+<pre>
+aucat -i /path/foo.wav
+</pre>
+
+<p>
+Remember that the server doesn't keep the device open while it's not
+used; this allows non-sndio programs to "steal" the device.
+
+<h2>Configuration as a system service</h2>
+
+<h3>Systems using System-V init scripts</h3>
+
+<p>
+The corresponding /etc/init.d bits are in the contrib/ directory:
+
+<pre>
+cp contrib/init.d.sndiod /etc/init.d/sndiod
+cp contrib/default.sndiod /etc/default/sndiod
+chmod 755 /etc/init.d/sndiod
+update-rc.d sndiod defaults
+</pre>
+
+<p>
+Start the daemon:
+<pre>
+service sndiod start
+</pre>
+
+<p>
+Make the daemon start automatically at system boot, do:
+<pre>
+update-rc.d sndiod enable
+</pre>
+
+<h3>Systems using systemd</h3>
+
+<p>
+The corresponding /etc/systemd/system bits are in the contrib/ directory:
+
+<pre>
+cp contrib/sndiod.service /etc/systemd/system
+cp contrib/default.sndiod /etc/default/sndiod
+systemctl daemon-reload
+</pre>
+
+<p>
+Start the daemon:
+<pre>
+systemctl start sndiod
+</pre>
+
+<p>
+Make the daemon start automatically at system boot, do:
+<pre>
+systemctl enable sndiod
+</pre>
+
+<p>
+<small><i>
+Last updated sep 23, 2020
+</i></small>
+
+</body>
+</html>
