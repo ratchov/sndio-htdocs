@@ -30,7 +30,7 @@
 <h2>Requirements</h2>
 
 <p>
-On Linux only ALSA headers and libraries are necessary:
+On Linux, only ALSA headers and libraries are necessary:
 
 <ul>
 
@@ -43,7 +43,7 @@ On Linux only ALSA headers and libraries are necessary:
 <h2>Download sources</h2>
 
 <p>
-Sources of the latest stable release (jul 11, 2020):
+Sources for the latest stable release (jul 11, 2020):
 
 <a href="sndio-1.7.0.tar.gz">sndio-1.7.0.tar.gz</a>
 
@@ -94,7 +94,7 @@ the server to stay in foreground):
 sndiod -dd
 </pre>
 
-In another window try to play a .wav file:
+In another window, try to play a .wav file:
 
 <pre>
 aucat -i /path/foo.wav
@@ -125,7 +125,7 @@ service sndiod start
 </pre>
 
 <p>
-Make the daemon start automatically at system boot, do:
+To make the daemon start automatically at system boot, do:
 <pre>
 update-rc.d sndiod enable
 </pre>
@@ -148,7 +148,7 @@ systemctl start sndiod
 </pre>
 
 <p>
-Make the daemon start automatically at system boot, do:
+To make the daemon start automatically at system boot, do:
 <pre>
 systemctl enable sndiod
 </pre>
