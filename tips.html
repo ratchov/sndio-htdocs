@@ -103,7 +103,7 @@
 <li><a href="#section_1_1">1.1 Aim of this document</a>
 <li><a href="#section_1_2">1.2 Device model overview</a>
 </ul>
-<li><a href="#section_2">2 Parameters negotiation</a>
+<li><a href="#section_2">2 Parameter negotiation</a>
 <ul>
 <li><a href="#section_2_1">2.1 Selecting formats and encodings</a>
 </ul>
@@ -111,11 +111,10 @@
 <li><a href="#section_4">4 Synchronizing stuff on audio playback</a>
 <ul>
 <li><a href="#section_4_1">4.1 Absolute play and record positions</a>
-<li><a href="#section_4_2">4.2 Playback latency a la GET_ODELAY</a>
-<li><a href="#section_4_3">4.3 Playback buffer usage a la GET_OSPACE</a>
-<li><a href="#section_4_4">4.4 Record buffer usage a la GET_ISPACE</a>
+<li><a href="#section_4_2">4.2 Playback latency à la GET_ODELAY</a>
+<li><a href="#section_4_3">4.3 Playback buffer usage à la GET_OSPACE</a>
+<li><a href="#section_4_4">4.4 Record buffer usage à la GET_ISPACE</a>
 <li><a href="#section_4_5">4.5 Sleeping until there's space for one block in the play buffer</a>
-<li><a href="#section_4_6">4.6 Calling poll(2) with no descriptors</a>
 </ul>
 <li><a href="#section_5">5 Choosing and using the block size</a>
 <ul>
@@ -149,8 +148,8 @@
 
 <p>
 
-This document quickly gives tips on how to write new code for the
-sndio API or how to port existing code to it.
+This document contains simple tips on how to write new code for the
+sndio API as well as how to port existing code to it.
 
 This document doesn't explain how to invoke sndio functions, which are
 already described in the sio_open(3) manual page.
@@ -162,7 +161,7 @@ designed to make this possible.
 
 If something looks complicated, the approach may be wrong.
 
-In some cases it may be better to drop some complicated feature rather
+In some cases, it may be better to drop some complicated feature rather
 than adding hackish code that may hurt the overall correctness and
 robustness of the application.
 
@@ -175,42 +174,42 @@ The sndio device model is as follows:
 
 <li>
 A bidirectional data stream exists between the program and the
-sound-card, for the <i>play</i> and <i>record</i> directions
+sound-card, for the <i>play</i> and <i>record</i> directions,
 respectively.
 
 <li>
-Data is a sequence of frames, each frame corresponds to a sample for
-all channels of the stream.
+Data is a sequence of frames, where each frame corresponds to a
+sample for all channels of the stream.
 
 It is submitted and retrieved using functions similar to the read(2)
 and write(2) syscalls.
 
 <li>
 A wall clock ticks when samples are processed by the hardware; i.e.
-the <i>n</i>-th frame of the stream, corresponds to the <i>n</i>-th
+the <i>n</i>-th frame of the stream corresponds to the <i>n</i>-th
 clock tick.
 
 The clock is exposed through a callback mechanism: a function
-registered by the program is called periodically, it receives as argument
+registered by the program is called periodically, which takes as argument
 the number of clock ticks elapsed since the last call.
 
 </ul>
 
-In other words, the <i>n</i>-th sample read is recorded exactly whene
+In other words, the <i>n</i>-th sample read is recorded exactly when
 the <i>n</i>-th written sample is played.
 
-This implies, that samples to play must be written before
+This means that samples to play must be written before
 recorded samples can be read, otherwise a deadlock will occur.
 
-<h2><a name="section_2">2 Parameters negotiation</a></h2>
+<h2><a name="section_2">2 Parameter negotiation</a></h2>
 
-To minimize mistakes, the following approach could
+To minimize mistakes, the following approach can
 be used:
 
 <ol>
 
 <li>
-call sio_setpar(3) using the application native parameters.
+call sio_setpar(3) using the application's native parameters.
 
 <li>
 call sio_getpar(3) and verify whether returned parameters
@@ -220,7 +219,7 @@ are usable.
 
 <p>
 Certain applications support multiple parameters sets, so if the above
-steps failed, you may want to retry with another set. But that's
+steps failed, you may want to retry with another set. However, that's
 unlikely to work in real life for two reasons:
 
 <ul>
@@ -228,11 +227,11 @@ unlikely to work in real life for two reasons:
 <li>
 apps often support "common" formats that "common" hardware
 supports, so if it didn't work, it's probably because the
-hardware is not so "common". So trying another "common"
-format the application supports has little chances to work
+hardware is not so "common". Therefore, trying another "common"
+format the application supports has little chance of working
 
 <li>
-that's more code, so more changes to introduce a bug. Why? to allow
+that's more code, so greater chance of introducing a bug. Why? To allow
 the app to emulate the format one particular piece of
 hardware supports. Is it worth the effort given that sndiod(8)
 already does emulation and supports <b>any</b> hardware
@@ -269,8 +268,7 @@ if (par.rate &lt; 44100 * 995 / 1000 ||
 ...
 </pre>
 
-<p>
-As sndiod(8) is used by default, sio_setpar(3) will always use the correct
+As sndiod(8) is used by default, sio_setpar(3) will always use the requested
 parameters.
 
 If the user has requested direct access to the hardware, then
@@ -285,13 +283,13 @@ application to produce data to play (or to consume recorded data).
 If the application doesn't respect this constraint, xruns will occur.
 
 <p>
-So we must estimate the maximum time it will take to
-prepare the data and to fill the buffer and then choose a slightly larger
+Therefore, we must estimate the maximum time it will take to
+prepare the data and to fill the buffer, and then choose a slightly larger
 buffer size by setting the appbufsz parameter in the sio_par
 structure.
 
 <p>
-On a multitasking system, the delay estimation must take into account
+On a multitasking system, the delay estimate must take into account
 the other processes hogging the system.
 
 On a typical Unix-like system, a margin of around
@@ -299,7 +297,7 @@ On a typical Unix-like system, a margin of around
 will choose a reasonable value, something around 50ms.
 
 <p>
-Example, consider a file player. It's organized as follows:
+For example, consider a file player. It's organized as follows:
 
 <pre>
 for (;;) {
@@ -308,20 +306,19 @@ for (;;) {
 }
 </pre>
 
-the maximum time it takes to the application to call play_from_fifo()
+The maximum time it takes for the application to call play_from_fifo()
 is roughly equal to the maximum time read_file_to_fifo() takes to
-complete. Reading from a file, may block for around 50ms, so say
-~100ms of buffer is largely OK. If the file uses 44.1kHz sampling
+complete. Reading from a file may block for around 50ms, so around
+100ms of buffer is mostly OK. If the file uses a 44.1kHz sampling
 rate, then the buffer size is:
 
 <pre>
 0.1s * 44100Hz = 4410 frames
 </pre>
 
-<p>
-Below are few orders of magnitudes of maximum delays measured on a
-slow i386 with ~2 users doing simple stuff (editors, basic X11,
-compilations):
+The orders of magnitudes of the maximum delay for different operations,
+measured on a slow i386 system with ~2 users doing simple stuff
+(editors, basic X11, compilations), can be seen below:
 
 <p align="center">
 <table>
@@ -355,7 +352,7 @@ compilations):
 
 <b>Note</b>: the device may choose a different buffer size that the one the
 application requested.
-In any case the application must use sio_getpar() and take into account the
+In any case, the application must use sio_getpar(3) and take into account the
 actual buffer size.
 
 <h2><a name="section_4">4 Synchronizing stuff on audio playback</a></h2>
@@ -412,7 +409,7 @@ It's called from one of the following functions:
 
 <li>sio_revents(3) after poll(2)
 
-<li>blocking sio_write(3) or sio_read(3)
+<li>blocking sio_write(3) and sio_read(3)
 
 </ul>
 
@@ -421,8 +418,8 @@ It's called from one of the following functions:
 
 <p>
 
-It's given by realpos, above. If the application needs this expressed
-in seconds:
+The absolute play position is given by realpos, from the above example.
+If the application needs this expressed in seconds:
 
 <pre>
 realpos_sec = realpos / par.rate;
@@ -431,7 +428,7 @@ realpos_sec = realpos / par.rate;
 Note that in earlier versions of sndio, ``realpos'' could be
 negative, but that feature was removed.
 
-<h3><a name="section_4_2">4.2 Playback latency a la GET_ODELAY</a></h3>
+<h3><a name="section_4_2">4.2 Playback latency à la GET_ODELAY</a></h3>
 
 The playback latency is the delay (expressed in number of frames) that
 it will take until the last frame that was written becomes audible.
@@ -442,26 +439,25 @@ writepos = writecnt / (par.pchan * par.bps);	/* convert to frames */
 bufused = writepos - realpos;
 </pre>
 
-<p>
 The recording latency is generally zero, since the application is
 waiting and consuming the data immediately.
 
-<h3><a name="section_4_3">4.3 Playback buffer usage a la GET_OSPACE</a></h3>
+<h3><a name="section_4_3">4.3 Playback buffer usage à la GET_OSPACE</a></h3>
 
 <p>
 
 Certain applications ask for the number of bytes left in the playback
-buffer assuming that sio_write(3) will not block if the program writes
+buffer, assuming that sio_write(3) will not block if the program writes
 less than the space available in the buffer.
 
 <b>This is wrong</b>, but sometimes it's not desirable to change the
-application so the buffer space used could be calculated as follows:
+application, so the available buffer space could be calculated as follows:
 
 <pre>
 space_avail = par.bufsz - bufused;
 </pre>
 
-<h3><a name="section_4_4">4.4 Record buffer usage a la GET_ISPACE</a></h3>
+<h3><a name="section_4_4">4.4 Record buffer usage à la GET_ISPACE</a></h3>
 
 Using this for non-blocking I/O is wrong too,
 nevertheless the buffer usage is:
@@ -475,14 +471,14 @@ bufused = realpos - readpos;
 
 <p>
 
-Certain applications require to sleep until there's space
+Certain applications want to sleep until there's space
 for at least one block in the play buffer.
 
 There's no way to wait for such an event, and that's not compatible
-with unix file semantics.
+with Unix file semantics.
 
+<p>
 The best approach is to change the application to use poll(2).
-
 If that's not possible, wait until the stream is writable as follows:
 
 <pre>
@@ -490,7 +486,7 @@ void
 wait_space_avail(void)
 {
 	int nfds, revents;
-	struct pollfd pfds[1];
+	struct pollfd *pfds = malloc(sio_nfds(hdl) * sizeof(*pfds));
 	
 	do {
 		nfds = sio_pollfd(hdl, pfds, POLLOUT);
@@ -505,32 +501,14 @@ wait_space_avail(void)
 }
 </pre>
 
-Another approach would probably lead to stuttering or to a busy loop
+Other approaches would probably lead to stuttering or to a busy loop,
 which, in turn, may lead to stuttering.
 
-<h3><a name="section_4_6">4.6 Calling poll(2) with no descriptors</a></h3>
-
 <p>
+Note, however, that if poll(2) is called with no file descriptors
+and non-zero timeout, it will hang, and if timeout is negative, it
+will hang forever. That means we need to check if nfds is positive.
 
-If poll(2) is called with no file descriptors and non-zero timeout
-it would block.
-The correct Example:
-
-<pre>
-	...
-	
-	nfds = sio_pollfd(hdl, pfds, POLLOUT);
-	if (nfds &gt; 0) {
-		if (poll(pfds, nfds, -1) &lt; 0)
-			err(1, "poll failed");
-	}
-	revents = sio_revents(hdl, pfds);
-
-	...
-</pre>
-
-If we forget to check whether nfds is positive, poll(2) may be called
-with no descriptors to poll, and the program will hang forever.
 
 <h2><a name="section_5">5 Choosing and using the block size</a></h2>
 
@@ -538,10 +516,10 @@ with no descriptors to poll, and the program will hang forever.
 
 <p>
 
-Audio is a continuous stream of frames, however the hardware processes
+Audio is a continuous stream of frames, but the hardware processes
 them in blocks. A typical player will have an internal ring that will
 be filled by the player and consumed using sio_write(3). If the ring
-size is multiple of the hardware block size, then calls to
+size is a multiple of the hardware block size, then calls to
 sio_write(3) will be optimal.
 
 <p>
@@ -555,61 +533,57 @@ buf_size  = desired_buf_size + par.round - 1;
 buf_size -= buf_size % par.round;
 </pre>
 
-<p>
-
 The ``round'' parameter is very constrained by the hardware, so
 sio_setpar(3) only uses it as a hint.
 
 <h3><a name="section_5_2">5.2 Using a small block size for low latency</a></h3>
 
 The minimum latency a program can get is related to the minimum buffer
-size. And the minimum buffer size is often one or two blocks. So if an
-application needs a very low latency it must use a small block size
-too, but there's no need to change it explicitly.
+size, which is often one or two blocks. So if an application needs very
+low latency, it must use a small block size too, but there's no need to
+change it explicitly.
 
 <p>
 
 When changing the ``appbufsz'' parameter, an optimal block size is
 calculated by the sio_setpar(3) function. The sio_setpar(3) function
 will evolve to cope with future hardware and software constraints, so
-it's supposed to always do the right thing, on any hardware. So, to
-get the maximum robustness, don't change the block size.
+it's expected to always do the right thing, on any hardware. Therefore,
+in order to get the maximum robustness, don't change the block size.
 
 <h3><a name="section_5_3">5.3 Getting higher clock resolution for synchronization</a></h3>
 
 <p>
 
 Synchronization is based on the callback set with the sio_onmove(3)
-function. It's called periodically, once every time a block is
-processed. Basically this provides clock ticks to the program,
-corresponding to the sound card's clock.
+function. It's called periodically, every time a block is
+processed. Basically, this provides clock ticks to the program,
+which correspond to the sound card's clock.
 
 <p>
 
-If the block size is large, the tick rate is low, and the time makes
-big steps, that may not be desirable for applications requiring higher
+If the block size is large, the tick rate is low, and time increases in
+big steps, which may not be desirable for applications requiring higher
 clock resolution.
 
-The easier solution is to use a smaller block size to get a higher
+The easiest solution is to use a smaller block size to get a higher
 tick rate. This approach has the advantage of being very accurate,
-but it's CPU intensive. Also it's not always possible to choose the
-block size (eg. because of hardware constraints).
+but it's CPU intensive. It's also not always possible to choose the
+block size (e.g. because of hardware constraints).
 
 <p>
 
 Example: a video player plays 25 images per second. To get a smooth
-video, images must be displayed at regular time intervals. Thus the
-clock resolution must be at least twice the image rate, so 50 ticks
-per second. If the audio is at 44.1kHz, the maximum block size to get
+video, images must be displayed at regular time intervals. Thus, the
+clock resolution must be at least twice the image rate, i.e. 50 ticks
+per second. If the audio rate is 44.1kHz, the maximum block size to get
 smooth video is:
 
 <pre>
 44100Hz / 50Hz = 882 frames per block
 </pre>
 
-<p>
-
-Another solution is to use large block size, and extrapolate the
+Another solution is to use a large block size, and extrapolate the
 time between clock ticks using gettimeofday(2). This is more
 complicated to get right, but works in all situations, is less CPU
 intensive and works even if very high clock resolution is needed.
@@ -624,8 +598,8 @@ It's as simple as calling sio_setvol(3) with a value in the 0..127
 range, where 0 means ``mute the stream'' and 127 is the maximum volume
 (the default).
 
-Certain apps use percents in the 0..100 range, if so a conversion must
-be done as follows:
+Certain apps use percents in the 0..100 range, in that case a conversion
+must be performed as follows:
 
 <pre>
 #define PCT_TO_SIO(pct)	((127 * (pct) + 50) / 100)
@@ -687,19 +661,19 @@ work as follows:
 
 One may think that it's enough to set a global ``current volume''
 variable in the callback and to return it in the getter.  This can't
-work because the below property is required:
+work because the following property is required:
 
 <pre>
 x == SIO_TO_PCT(PCT_TO_SIO(x))		/* for all x */
 y == PCT_TO_SIO(SIO_TO_PCT(y))		/* for all y */
 </pre>
 
-So it may lead to various weired effects like the cursor stuttering
+So it may lead to various weird effects like the cursor stuttering
 around a given position, or ``+/- volume'' keyboard shortcuts not
 working.
 
-The correct implementation is to use feedback as in the above section,
-if that's not possible, a fake getter can be implemented as follows:
+The correct implementation is to use feedback as in the above section.
+If that's not possible, a fake getter can be implemented as follows:
 
 <pre>
 unsigned current_pct;
@@ -714,7 +688,7 @@ cb(void *addr, unsigned vol)
 unsigned
 getvol(int p)
 {
-	return current_vol;
+	return current_pct;
 }
 </pre>
 
@@ -725,8 +699,8 @@ getvol(int p)
 Pause and resume functions do not exist, because it's hard to properly
 implement on <b>any</b> hardware.
 
-If the pause feature is required, the easier is stop the
-stream with sio_stop() and later to restart it with sio_start().
+If the pause feature is required, it's easier to stop the
+stream with sio_stop(3) and to later restart it with sio_start(3).
 
 <p>
 Certain programs expect a pause-resume cycle to not change the
@@ -739,24 +713,23 @@ amount of data the buffer contained when the "pause" function was called.
 
 <b>Update&nbsp;: </b>Doing nothing would also work, but only in few cases.
 
-Just stop providing data to play, the stream will underrun and stop
+If you just stop providing data to play, the stream will underrun and stop
 automatically.
 
 Once data is available again, the stream will resume automatically.
 
-But this abuse of the xrun mechanism is not desirable for two reasons:
+However, this abuse of the xrun mechanism is not desirable for two reasons:
 
 <ul>
 
-<li>The device will still processing data (silence)
-and will waste CPU time (which consumes more current from laptop batteries).
+<li>The device will still be processing data (silence)
+and will waste CPU time (which consumes more energy from laptop batteries).
 
 <li>This doesn't work if sndiod(8) is used and the subdevice is controlled
 by MMC.
 
-Indeed, sndiod(8) will try to resynchronize after the underrun and will try
-yo drop a huge amount of samples, corresponding to the duration of the
-pause.
+Indeed, sndiod(8) will try to resynchronize after the underrun and will
+drop a huge amount of samples, corresponding to the duration of the pause.
 
 </ul>
 
@@ -770,7 +743,7 @@ as all calls to function using the same handle are serialized.
 This is achieved either with locks or by simply running all sndio
 related bits in the same thread.
 
-Anyway, using multiple threads to handle audio I/O buys nothing since
+In any case, using multiple threads to handle audio I/O buys nothing since
 the process is I/O bound.
 
 <h2><a name="section_9">9 Windows-style callbacks</a></h2>
@@ -782,11 +755,11 @@ automatically by the audio subsystem whenever the play buffer must be
 filled.
 
 For instance, Windows, jack and portaudio APIs use such semantics;
-callbacks are called typically by a real-time thread or at interrupt
+callbacks are tipically called by a real-time thread or in an interrupt
 context.
 
-This approach is equivalent to the read/writed based approach
-widespread on Unix.
+This approach is equivalent to the read/write based approach,
+which is widespread on Unix.
 
 Consider the following callback-style pseudo-code:
 
@@ -832,43 +805,42 @@ main(void)
 
 there's no fundamental difference.
 
-In other words any callback style API could be exposed using sndio.
+In other words, any callback style API could be exposed using sndio.
 
 The only remaining problem is where to put the sndio loop.
 
 <p>
 
-If the program is single-threaded, then it uses a poll()-based event
+If the program is single-threaded, then it uses a poll(2)-based event
 loop, in which case non-blocking I/O should be used and the sndio bits
-should be hooked somewhere in the poll() loop.
+should be hooked somewhere in the poll(2) loop.
 
-But such programs probably come from the unix world and don't use a
+However, such programs probably come from the Unix world and don't use a
 callback-style API.
-
 
 <p>
 
-If the program is multi-threaded, then the simpler is to spawn
-a thread and run above simple loop in it.
+If the program is multi-threaded, then it is simpler to spawn
+a thread and run the simple loop from above in it.
 
-The thread could be spawned when sio_start() is called and
-terminated when sio_stop() is called; if so the threads contains
+The thread could be spawned when sio_start(3) is called and
+terminated when sio_stop(3) is called; if so, the thread contains
 real-time code paths only, and its scheduling priority could be cranked.
 
 <p>
 Multi-threaded programs use locks for synchronization, and
-we want no thread to sleep while holding a lock.
+we don't want a thread to sleep while holding a lock.
 
-To avoid holding a lock while a blocking sio_write() is sleeping, one
-can use non-blocking I/O and sleep in poll() without holding the
-lock. In other words sio_write() should be expanded as follows:
+To avoid holding a lock while a blocking sio_write(3) call is sleeping,
+one can use non-blocking I/O and sleep in poll(2) without holding the
+lock. In other words, sio_write(2) could be expanded as follows:
 
 <pre>
 	unsigned char *p = buf;
 	struct pollfds pfds[MAXFDS];
 
 	...
-	pthread_mutex_lock(hdl_mtx);
+	pthread_mutex_lock(&amp;hdl_mtx);
 	...
 
 	for (;;) {
@@ -878,8 +850,10 @@ lock. In other words sio_write() should be expanded as follows:
 		}
 		n = sio_pollfds(hdl, pfds);
 		pthread_mutex_unlock(&amp;hdl_mtx);
-		if (poll(pfds, n, -1) &lt; 0)
+		if (n &gt; 0 &amp;&amp; poll(pfds, n, -1) &lt; 0) {
+			pthread_mutex_lock(&amp;hdl_mtx);
 			continue;
+		}
 		pthread_mutex_lock(&amp;hdl_mtx);
 		if (sio_revents(hdl, pfds) &amp; POLLOUT) {
 			n = sio_write(hdl, p, buflen - (p - buf));
@@ -896,7 +870,7 @@ lock. In other words sio_write() should be expanded as follows:
 
 If for any reason a full-duplex program stops consuming recorded
 data, there's a buffer overrun and recording stops. But since playback
-and record direction are synchronous, this will stop playback too.
+and record direction are synchronous, this will also stop playback.
 
 For instance, waiting for playback to drain without consuming recorded
 data will never complete, because the record direction will pause
@@ -912,25 +886,25 @@ It should never be used for latency or buffer usage calculations.
 
 <p>
 The ``bufsz'' parameter is read-only and gives the total buffering
-between the application and Joe's ears, it's actually the latency. It
-takes into account any buffering including uncontrolled buffering of
-network sockets.
+between the application and Joe's ears, i.e. it's the actual latency.
+It takes into account any buffering including uncontrolled buffering
+of network sockets.
 
 <h3><a name="section_10_3">10.3 How many bytes to store a 24-bit sample</a></h3>
 
 <p>
 
 Short answer: four. Hardware, as most of the software, stores 24-bit
-samples in 4-byte words, this format is often referred as ``s24le'' or
-``s24be''. It's the default when 24-bit encodings are requested.
+samples in 4-byte words. This format is often referred to as ``s24le''
+or ``s24be'', and it's the default when 24-bit encodings are requested.
 
 <p>
-However that's not always the case: .wav and .aiff files store 24-bit
+However, that's not always the case: .wav and .aiff files store 24-bit
 samples in 3-byte words to save space. This encoding is often
-referred as ``s24le3'' or ``s24be3''.
+referred to as ``s24le3'' or ``s24be3''.
 
 If a program just reads and plays such files without any processing,
-it's likely it will try to send the file contends on the audio stream
+it's likely it will try to send the file contents on the audio stream
 as-is. If so, the parameters should be set as follows:
 
 <pre>
@@ -958,7 +932,7 @@ wait_ready(void)
 </pre>
 
 where the ``bufused'' variable is updated asynchronously by the
-callback set with sio_onmove(3).  Then suppose it's called as
+callback set with sio_onmove(3).  Suppose it's then called as
 follows:
 
 <pre>
@@ -969,11 +943,10 @@ for (;;) {
 }
 </pre>
 
-<p>
 This will deadlock. The callback is invoked from sio_write(3), but
-sio_write(3) is not called until the ``bufused'' is updated by the
-callback. The correct implementation is by using poll(2), 
-as follows, it's also more efficient:
+sio_write(3) is not called until ``bufused'' is updated by the
+callback. The correct implementation uses poll(2) as follows; it's
+also more efficient:
 
 <pre>
 void
@@ -984,8 +957,10 @@ wait_ready(void)
 	
 	do {
 		nfds = sio_pollfd(hdl, pfds, POLLOUT);
-		if (poll(pfds, nfds, -1) &lt; 0)
-			err(1, "poll failed");
+		if (nfds &gt; 0) {
+			if (poll(pfds, nfds, -1) &lt; 0)
+				err(1, "poll failed");
+		}
 		revents = sio_revents(hdl, pfds);
 	} while (!(revents &amp; POLLOUT));
 }
@@ -999,8 +974,8 @@ wait_ready(void)
 <dt>channel
 
 <dd>
-that's a mono signal. Multiple channels form a audio stream. Example a
-stereo stream has two channels: left and right. Channels are
+that's a mono signal. Multiple channels form an audio stream. For example,
+a stereo stream has two channels: left and right. Channels are
 identified by small integers rather than names; so ``channel 0'' means
 the ``left channel''.
 
@@ -1057,14 +1032,14 @@ channels numbers start from zero and are ordered as follows:
 <p>	
 above, 0 is the origin, but that's arbitrary. The important
 point is that ``main left'' is just before ``main right''.
-This allows for instance the rear speakers to be viewed as a
-stereo substream.
+This allows, for example, for the rear speakers to be viewed
+as a stereo substream.
 
 <dt>sample
 
 <dd>
 it's a scalar value representing ``the voltage'' on a given
-channel. The signal, is a sequence of samples. We represent
+channel. The signal is a sequence of samples. We represent
 them as integers.
 
 <dt>
@@ -1081,7 +1056,7 @@ rate
 
 <dd>
 the number of frames per second the streams carries,
-eg. 44.1kHz, 48kHz
+e.g. 44.1kHz, 48kHz
 
 <dt>
 encoding
@@ -1103,7 +1078,7 @@ followed by the number of bits
 followed by ``le'' or ``be'' for little or big endian.
 
 <li>
-followed by the number of bytes the bits are stored.
+followed by the number of bytes in which the bits are stored.
 
 <li>
 followed by ``msb'' or ``lsb'' indicating how the significant
@@ -1143,15 +1118,15 @@ underrun
 played frames are buffered. If the producer (eg. the
 application) doesn't provide frames fast enough, the
 consumer (eg. the sound card) may end up without frames to
-play. Thus it will play something else (because it cant's
-stop), often it plays silence.
+play. Thus it will play something else (because it can't
+stop); often, it plays silence.
 
 <dt>
 overrun
 
 <dd>
 the recorded frames are buffered. If the consumer (eg. the
-application doesn't consume them fast enough, the producer
+application) doesn't consume them fast enough, the producer
 (eg. the sound card) may not be able to store newly recorded
 frames in the buffer, thus it will discard them (because it
 can't stop recording).
@@ -1160,10 +1135,10 @@ can't stop recording).
 xrun
 
 <dd>
-overrun or underrun. Note that on bidirectional streams, if
-one of the directions xruns, because both directions are
-synchronous, the error is present on the other direction too.
-For instance if the play buffer underruns, recorded frames
+overrun or underrun. Note that on bidirectional streams, since
+both directions are synchronous, if one of the directions xruns,
+the error is present in the other direction as well.
+For instance, if the play buffer underruns, recorded frames
 during the underrun are lost.
 
 </dl>
