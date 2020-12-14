@@ -34,8 +34,8 @@ Sndio is a small audio and MIDI framework part of the OpenBSD project
 and ported to FreeBSD, Linux and NetBSD.
 
 It provides a lightweight audio & MIDI server and a fully
-documented user-space API to access either the server or directly the
-hardware in a uniform way.
+documented user-space API to access either the server or the hardware
+directly in a uniform way.
 
 Sndio is designed to work for desktop applications, but pays special
 attention to synchronization mechanisms and reliability required by
@@ -47,8 +47,8 @@ project goals.
 <h2>Operating systems supporting sndio</h2>
 
 <p>
-This source code builds on any OpenBSD, Linux, or FreeBSD
-system with no modifications.
+This source code builds on any OpenBSD, Linux, and FreeBSD
+systems with no modifications.
 
 Patches to make sndio build on NetBSD are available in the ports tree.
 
@@ -70,8 +70,8 @@ NetBSD, in the ports tree
 </ul>
 
 <p>
-Porting sndio, consists of writing a module for the sndio library;
-it is around a thousand lines of C.
+Porting sndio consists of writing a module for the sndio library;
+it takes around a thousand lines of C.
 
 The sndio daemon itself uses this library for audio I/O so it requires
 virtually no porting efforts.
@@ -79,7 +79,7 @@ virtually no porting efforts.
 <h2>Programs supporting sndio</h2>
 
 <p>
-Many open-source programs including major media-players, web-browsers,
+Many open-source programs, including major media-players, web-browsers,
 audio libraries and utilities have native sndio support.
 
 Other programs have patches in the OpenBSD ports tree waiting for
@@ -124,7 +124,7 @@ The complete documentation is part of the OpenBSD project:
 
 <li>
 <a href="https://man.openbsd.org/sndiod">sndiod(8)</a>
-- audio & MIDI server manual
+- audio &amp; MIDI server manual
 
 <li>
 <a href="https://man.openbsd.org/sio_open">sio_open(3)</a>
@@ -133,6 +133,10 @@ The complete documentation is part of the OpenBSD project:
 <li>
 <a href="https://man.openbsd.org/mio_open">mio_open(3)</a>
 - MIDI programming interface
+
+<li>
+<a href="https://man.openbsd.org/sioctl_open">sioctl_open(3)</a>
+- audio parameters interface
 
 </ul>
 
